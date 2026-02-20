@@ -8,7 +8,7 @@ import { getUserFriends, getArcadeProfile, getAvatarItems, getMyAvatar } from ".
 import FriendCard from "../components/FriendCard";
 import NoFriendsFound from "../components/NoFriendsFound";
 import Avatar from "../components/Avatar";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 
 const ACHIEVEMENT_INFO = {
     first_win: { name: "First Win", desc: "Won your first game", icon: "🏆" },

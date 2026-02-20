@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { submitMath } from "../lib/api";
 import { ArrowLeft, RotateCcw, Trophy, Frown, Settings, Timer, Zap } from "lucide-react";

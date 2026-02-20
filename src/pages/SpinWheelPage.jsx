@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { spinWheel } from "../lib/api";
 import { ArrowLeft, Gift, Sparkles } from "lucide-react";

@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { submitNumberGuess } from "../lib/api";
 import { ArrowLeft, RotateCcw, Trophy, Frown, Settings, ArrowUp, ArrowDown, Check } from "lucide-react";

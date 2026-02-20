@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { getLeaderboard } from "../lib/api";
 import { ArrowLeft, Trophy, Medal, Crown } from "lucide-react";
 import useAuthUser from "../hooks/useAuthUser";
