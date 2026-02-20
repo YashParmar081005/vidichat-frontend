@@ -4,7 +4,7 @@ import "stream-chat-react/dist/css/v2/index.css";
 import "./index.css";
 import App from "./App.jsx";
 
-import { BrowserRouter } from "react-router";
+import { HashRouter } from "react-router-dom";   // ✅ change this
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -12,10 +12,10 @@ const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
+    <HashRouter>   {/* ✅ change this */}
       <QueryClientProvider client={queryClient}>
         <App />
       </QueryClientProvider>
-    </BrowserRouter>
+    </HashRouter>
   </StrictMode>
 );
