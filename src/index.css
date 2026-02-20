@@ -1,0 +1,148 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@layer utilities {
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out forwards;
+}
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.str-chat__channel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.str-chat__container {
+  max-width: 1200px;
+  width: 100%;
+  height: 100% !important;
+  margin: 0 auto !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.str-chat__list {
+  background-color: transparent;
+  padding: 12px;
+}
+
+.str-chat__list-notifications {
+  display: none;
+}
+
+.str-chat__message-input {
+  border-top: 1px solid oklch(var(--b3));
+}
+
+/* OVERRIDE STREAM CHAT THEME WITH DAISYUI VARIABLES */
+[data-theme] {
+  /* Colors */
+  --str-chat__primary-color: var(--p);
+  --str-chat__active-primary-color: var(--p);
+  --str-chat__surface-color: var(--b1);
+  --str-chat__secondary-surface-color: var(--b2);
+  --str-chat__tertiary-surface-color: var(--b3);
+
+  --str-chat__primary-text-color: var(--bc);
+  --str-chat__secondary-text-color: color-mix(in oklch, var(--bc), transparent 40%);
+  --str-chat__disabled-color: var(--n);
+
+  /* Message Bubbles - Own (Primary) */
+  --str-chat__message-bubble-background-color: var(--p);
+  --str-chat__message-text-color: var(--pc);
+
+  /* Message Bubbles - Other (Neutral/Base200) */
+  --str-chat__message-bubble-background-color--other: var(--b2);
+  --str-chat__message-text-color--other: var(--bc);
+
+  /* Header & Channel List */
+  --str-chat__header-background-color: var(--b1);
+  --str-chat__header-text-color: var(--bc);
+  --str-chat__channel-list-background-color: var(--b2);
+  --str-chat__channel-preview-background-color: transparent;
+  --str-chat__channel-preview-active-background-color: var(--b3);
+
+  /* Input Area */
+  --str-chat__input-background-color: var(--b1);
+  --str-chat__input-border-color: var(--b3);
+  --str-chat__input-text-color: var(--bc);
+}
