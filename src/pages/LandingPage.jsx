@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "../lib/simpleRouter";
 import { useThemeStore } from "../store/useThemeStore";
 import { MessageSquare, Video, Zap, Shield, Users, Palette, Gamepad2, Trophy, UserCircle, Globe, ArrowRight } from "lucide-react";
 import Logo from "../components/Logo";

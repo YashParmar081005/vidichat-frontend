@@ -1,5 +1,5 @@
 import { Video } from "lucide-react";
-import { Link } from "react-router";
+import { Link } from "../lib/simpleRouter";
 
 const Logo = ({ className = "", size = "normal", showText = true }) => {
     const isSmall = size === "small";

@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router";
+import { Link, useLocation } from "../lib/simpleRouter";
 import useAuthUser from "../hooks/useAuthUser";
 import { BellIcon, LogOutIcon, Menu, Video } from "lucide-react";
 import ThemeSelector from "./ThemeSelector";

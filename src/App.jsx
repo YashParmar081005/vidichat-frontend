@@ -1,5 +1,3 @@
-import { Navigate, Route, Routes } from "react-router-dom";
-
 import HomePage from "./pages/HomePage.jsx";
 import SignUpPage from "./pages/SignUpPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
@@ -29,6 +27,26 @@ import MathBattlePage from "./pages/MathBattlePage.jsx";
 import ReactionTestPage from "./pages/ReactionTestPage.jsx";
 import MemoryGamePage from "./pages/MemoryGamePage.jsx";
 import AvatarWorldPage from "./pages/AvatarWorldPage.jsx";
+import { RouterContext, Navigate } from "./lib/simpleRouter";
+
+// simple pattern matcher: '/users/:id' -> { id }
+const matchPath = (pattern, path) => {
+  const trim = (s) => s.replace(/^\/|\/$/g, "");
+  const pParts = trim(pattern).split("/").filter(Boolean);
+  const tParts = trim(path).split("/").filter(Boolean);
+  if (pParts.length !== tParts.length) {
+    if (pattern === "/" && (path === "/" || path === "")) return {};
+    return null;
+  }
+  const params = {};
+  for (let i = 0; i < pParts.length; i++) {
+    const pp = pParts[i];
+    const tp = tParts[i];
+    if (pp.startsWith(":")) params[pp.slice(1)] = decodeURIComponent(tp);
+    else if (pp !== tp) return null;
+  }
+  return params;
+};
 
 const App = () => {
   const { isLoading, authUser } = useAuthUser();
@@ -37,258 +55,70 @@ const App = () => {
   const isAuthenticated = Boolean(authUser);
   const isOnboarded = authUser?.isOnboarded;
 
+  const [path, setPath] = useState(typeof window !== "undefined" ? window.location.pathname : "/");
+  useEffect(() => {
+    const onPop = () => setPath(window.location.pathname);
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
   if (isLoading) return <PageLoader />;
+
+  const routes = [
+    {
+      pattern: "/",
+      element: () => (isAuthenticated && isOnboarded ? <Layout showSidebar={true}><HomePage /></Layout> : <LandingPage />),
+    },
+    {
+      pattern: "/profile",
+      element: () => (isAuthenticated && isOnboarded ? <Layout showSidebar={true}><ProfilePage /></Layout> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />),
+    },
+    {
+      pattern: "/profile/:id",
+      element: (params) => (isAuthenticated && isOnboarded ? <Layout showSidebar={true}><UserProfilePage params={params} /></Layout> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />),
+    },
+    {
+      pattern: "/friends",
+      element: () => (isAuthenticated && isOnboarded ? <Layout showSidebar={true}><FriendsPage /></Layout> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />),
+    },
+    { pattern: "/signup", element: () => (!isAuthenticated ? <SignUpPage /> : <Navigate to={isOnboarded ? "/" : "/onboarding"} />) },
+    { pattern: "/login", element: () => (!isAuthenticated ? <LoginPage /> : <Navigate to={isOnboarded ? "/" : "/onboarding"} />) },
+    { pattern: "/notifications", element: () => (isAuthenticated && isOnboarded ? <Layout showSidebar={true}><NotificationsPage /></Layout> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />) },
+    { pattern: "/call/:id", element: (params) => (isAuthenticated && isOnboarded ? <CallPage params={params} /> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />) },
+    { pattern: "/chat/:id", element: (params) => (isAuthenticated && isOnboarded ? <Layout showSidebar={false}><ChatPage params={params} /></Layout> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />) },
+    { pattern: "/arcade", element: () => (isAuthenticated && isOnboarded ? <Layout showSidebar={true}><ArcadePage /></Layout> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />) },
+    { pattern: "/arcade/tictactoe", element: () => (isAuthenticated && isOnboarded ? <Layout showSidebar={true}><TicTacToePage /></Layout> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />) },
+    { pattern: "/arcade/rps", element: () => (isAuthenticated && isOnboarded ? <Layout showSidebar={true}><RockPaperScissorsPage /></Layout> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />) },
+    { pattern: "/arcade/typing", element: () => (isAuthenticated && isOnboarded ? <Layout showSidebar={true}><TypingTestPage /></Layout> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />) },
+    { pattern: "/arcade/spin", element: () => (isAuthenticated && isOnboarded ? <Layout showSidebar={true}><SpinWheelPage /></Layout> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />) },
+    { pattern: "/arcade/numberguess", element: () => (isAuthenticated && isOnboarded ? <Layout showSidebar={true}><NumberGuessPage /></Layout> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />) },
+    { pattern: "/arcade/math", element: () => (isAuthenticated && isOnboarded ? <Layout showSidebar={true}><MathBattlePage /></Layout> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />) },
+    { pattern: "/arcade/reaction", element: () => (isAuthenticated && isOnboarded ? <Layout showSidebar={true}><ReactionTestPage /></Layout> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />) },
+    { pattern: "/arcade/memory", element: () => (isAuthenticated && isOnboarded ? <Layout showSidebar={true}><MemoryGamePage /></Layout> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />) },
+    { pattern: "/leaderboard", element: () => (isAuthenticated && isOnboarded ? <Layout showSidebar={true}><LeaderboardPage /></Layout> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />) },
+    { pattern: "/avatar", element: () => (isAuthenticated && isOnboarded ? <Layout showSidebar={true}><AvatarWorldPage /></Layout> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />) },
+    { pattern: "/onboarding", element: () => (isAuthenticated ? (!isOnboarded ? <OnboardingPage /> : <Navigate to="/" />) : <Navigate to="/login" />) },
+  ];
+
+  let active = null;
+  let activeParams = {};
+  for (const r of routes) {
+    const params = matchPath(r.pattern, path);
+    if (params !== null) {
+      active = r;
+      activeParams = params || {};
+      break;
+    }
+  }
+
+  const content = active ? active.element(activeParams) : <LandingPage />;
 
   return (
     <div className="h-screen bg-base-100 transition-colors duration-200 overflow-hidden" data-theme={theme}>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}>
-                <HomePage />
-              </Layout>
-            ) : (
-              <LandingPage />
-            )
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}>
-                <ProfilePage />
-              </Layout>
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-        <Route
-          path="/profile/:id"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}>
-                <UserProfilePage />
-              </Layout>
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-        <Route
-          path="/friends"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}>
-                <FriendsPage />
-              </Layout>
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-        <Route
-          path="/signup"
-          element={
-            !isAuthenticated ? <SignUpPage /> : <Navigate to={isOnboarded ? "/" : "/onboarding"} />
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            !isAuthenticated ? <LoginPage /> : <Navigate to={isOnboarded ? "/" : "/onboarding"} />
-          }
-        />
-        <Route
-          path="/notifications"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}>
-                <NotificationsPage />
-              </Layout>
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-        <Route
-          path="/call/:id"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <CallPage />
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-
-        <Route
-          path="/chat/:id"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={false}>
-                <ChatPage />
-              </Layout>
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-
-        <Route
-          path="/arcade"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}>
-                <ArcadePage />
-              </Layout>
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-        <Route
-          path="/arcade/tictactoe"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}>
-                <TicTacToePage />
-              </Layout>
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-        <Route
-          path="/arcade/rps"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}>
-                <RockPaperScissorsPage />
-              </Layout>
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-        <Route
-          path="/arcade/typing"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}>
-                <TypingTestPage />
-              </Layout>
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-        <Route
-          path="/arcade/spin"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}>
-                <SpinWheelPage />
-              </Layout>
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-        <Route
-          path="/arcade/numberguess"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}>
-                <NumberGuessPage />
-              </Layout>
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-        <Route
-          path="/arcade/math"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}>
-                <MathBattlePage />
-              </Layout>
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-        <Route
-          path="/arcade/reaction"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}>
-                <ReactionTestPage />
-              </Layout>
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-        <Route
-          path="/arcade/memory"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}>
-                <MemoryGamePage />
-              </Layout>
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-        <Route
-          path="/leaderboard"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}>
-                <LeaderboardPage />
-              </Layout>
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-
-        <Route
-          path="/avatar"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}>
-                <AvatarWorldPage />
-              </Layout>
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
-
-        <Route
-          path="/onboarding"
-          element={
-            isAuthenticated ? (
-              !isOnboarded ? (
-                <OnboardingPage />
-              ) : (
-                <Navigate to="/" />
-              )
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
-      </Routes>
-
-      <Toaster />
+      <RouterContext.Provider value={{ path, params: activeParams, pattern: active?.pattern || "/" }}>
+        {content}
+        <Toaster />
+      </RouterContext.Provider>
     </div>
   );
 };

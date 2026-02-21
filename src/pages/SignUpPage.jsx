@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ShipWheelIcon, Video } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "../lib/simpleRouter";
 
 import useSignUp from "../hooks/useSignUp";
 

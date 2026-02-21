@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router";
+import { Link, useLocation } from "../lib/simpleRouter";
 import useAuthUser from "../hooks/useAuthUser";
 import { BellIcon, HomeIcon, UsersIcon, Menu, Video, Gamepad2, Trophy, Rocket } from "lucide-react";
 import Avatar from "./Avatar";

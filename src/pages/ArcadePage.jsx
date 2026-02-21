@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "../lib/simpleRouter";
 import { useQuery } from "@tanstack/react-query";
 import { getArcadeProfile } from "../lib/api";
 import {

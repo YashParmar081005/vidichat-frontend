@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link } from "../lib/simpleRouter";
 import { DEFAULT_AVATAR, LANGUAGE_TO_FLAG } from "../constants";
 
 const FriendCard = ({ friend }) => {

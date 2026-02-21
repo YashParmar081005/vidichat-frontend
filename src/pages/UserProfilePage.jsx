@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams } from "../lib/simpleRouter";
 import { useQuery } from "@tanstack/react-query";
 import { getUserProfile, getUserFriendsById } from "../lib/api";
 import { Mail, MapPin, Calendar, Languages } from "lucide-react";
