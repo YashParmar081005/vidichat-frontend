@@ -25,6 +25,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
+    "react-router-dom": "^6.30.3",
     "stream-chat": "^8.60.0",
     "stream-chat-react": "^12.14.0",
     "three": "^0.183.0",
